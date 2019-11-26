@@ -24,9 +24,12 @@ public class MovieCatalogController {
 	private RestTemplate resttemp;
 	
 	@RequestMapping("/{userId}")
-	@HystrixCommand(fallbackMethod = "getFallbackCatalog")
 	public List<CatalogItem> getCatalog(@PathVariable("userId") String userId)
 	{			
+		// mivel mar nem ezen (getCatalog) vana hystrix command, hanem a classon belul ez a method hiv egy amsik methodot, igy
+		// a hystrix wrapper/proxy nem mukodik
+		// emig ezen volt addig jo mert hystryx proxyzta az egész classt és o hivta a methodot es nezte van e hiba
+		
 		UserRating userRating = getUserRating(userId);
 		
 		return userRating.getUserRating().stream()
@@ -34,19 +37,32 @@ public class MovieCatalogController {
 				.collect(Collectors.toList());
 	}
 
+	@HystrixCommand(fallbackMethod = "getFlabbackCatalogItem")
 	private CatalogItem getCatalogItem(Rating rating) {
 		Movie movie = resttemp.getForObject("http://movie-info-service/movies/" + rating.getMovieId(), Movie.class);
 		return new CatalogItem(movie.getName(), "Test", rating.getRating());
 	}
+	
+	private CatalogItem getFlabbackCatalogItem(Rating rating) {
+		return new CatalogItem("Movie name Not available", "", rating.getRating());
+	}
+	
 
+	@HystrixCommand(fallbackMethod = "getFallbackUserRating")
 	private UserRating getUserRating(String userId) {
 		return resttemp.getForObject("http://ratings-data-service/ratingsdata/users/" + userId, UserRating.class);
 	}
 	
-	public List<CatalogItem> getFallbackCatalog(@PathVariable("userId") String userId)
-	{	
-		return Arrays.asList(new CatalogItem("Not available", "", 0));
-	}
+	private UserRating getFallbackUserRating(String userId) {
+		UserRating userrating = new UserRating();
+		userrating.setId(userId);
+		userrating.setUserRating(Arrays.asList(
+				new Rating("0", 0)));
+		
+		return userrating;
+	}	
+
+
 }
 
 //the future is webclient isntead of resttemplate
@@ -63,3 +79,30 @@ public class MovieCatalogController {
 // can return default response or a cached response (better).
 
 // the hystrix proxys (wraps the class, so hystrix makes the real calls and do the checks!) the requestapi ? and checks if its ok, if not then it uses the fallback method instead
+
+
+
+// ez a teljes methodra vonatkozik amiben 2 service call van, ha az egyik rossz ez hivodik az nem jo
+//public List<CatalogItem> getFallbackCatalog(@PathVariable("userId") String userId)	{	
+//	return Arrays.asList(new CatalogItem("Movie name Not available", "", 0));
+//}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
