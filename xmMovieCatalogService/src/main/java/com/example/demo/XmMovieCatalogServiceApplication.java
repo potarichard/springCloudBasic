@@ -9,10 +9,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.client.RestTemplate;
 
-import com.example.controller.MovieCatalogController;
+import com.example.demo.controller.MovieCatalogController;
 
 @SpringBootApplication
-@ComponentScan(basePackageClasses = MovieCatalogController.class)
+//@ComponentScan(basePackageClasses = MovieCatalogController.class)
 @EnableEurekaClient
 @EnableCircuitBreaker
 public class XmMovieCatalogServiceApplication {
