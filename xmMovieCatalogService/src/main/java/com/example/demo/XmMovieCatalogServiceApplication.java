@@ -17,6 +17,18 @@ import com.example.demo.controller.MovieCatalogController;
 @EnableCircuitBreaker
 public class XmMovieCatalogServiceApplication {
 
+	
+	// ebbena  cloudban, ez a service viselkedik API gateway-ként
+	// https://www.youtube.com/watch?v=sPgwbt7iREk - ez es a tobbi video zuul proxy
+	// https://www.youtube.com/watch?v=dZ8Z5DpcdrM
+	// https://www.youtube.com/watch?v=no-m5JK-gGc  lattam
+	// https://www.youtube.com/watch?v=rlS9eH5tEnY  hosszú
+	// https://www.youtube.com/watch?v=dZ8Z5DpcdrM  zuul & hystrix
+	
+	// zuul proxyval lehet lecserélni ezt a cuccot
+	// zuulba vannak filterek (pre, route, post, error) azok pontosan mire jók ?
+	// histrix a zuulban, mehet ?
+	
 	@Bean
 	@LoadBalanced	// service discovery and load baalance and more in 1 annotation
 	public RestTemplate getRestTemplate() {
